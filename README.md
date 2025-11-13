@@ -29,6 +29,7 @@ Develop a console application that utilizes parsing capabilities of Java to pars
 Use the task `fatJar` in the `core` module or select the `./app/core` as your working directory and run it from the IDE.
 
 ### Notes
+- Make sure to run the `core` project from a corresponding `working directory`. Otherwise the program would not find the needed files.
 - Two `Python` scripts were written to populate mock entities for the benchmarks with a `mediocre` data and a `large` data. They are located in the the underlying [JMH module](./app/jmh)
 - The necessary input data located in the `core` [module](./app/core/data) and the artifacts in the [build folder](./app/core/build) (after the compilation using `gradle fatJar`)
 - `JMH` was used for more precise benchmarks on the file processing time with multithreading and without it, but the naive calculation is also present below:
@@ -43,6 +44,5 @@ Use the task `fatJar` in the `core` module or select the `./app/core` as your wo
 | 16 threads                         | 4,716 ± 0,093 ms/op                                      | 0.49761 ms                                     | 
 | (processor cores + 1) threads      | 4,983 ± 0,445 ms/op                                      | 0.49548 ms                                               |
 
-So essentially we could conclude, that for each increase of threads we get a slightly better overall execution time. However in the case of an overhead (providing more threads than amount of the processor clear) we would expect to "naive" get slower (which is clear not the case in the "naive" data) because of the context switching and other side effects.
+So essentially we could conclude, that for each increase of threads we get a slightly better overall execution time, which the data shows. However in the case of an overhead (providing more threads than amount of the processor clear) we would expect the execution time to get slower (which is clearly not the case in the "naive" data) because of the context switching and other side effects.
 
-- Make sure to run the `core` project from a corresponding `working directory`. Otherwise the program would not find the needed files.
