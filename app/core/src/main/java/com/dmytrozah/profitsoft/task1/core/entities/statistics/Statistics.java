@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Statistics {
-
     private final Map<String, Long> occurrences = new TreeMap<>();
 
     public Statistics increaseOccurrences(final String attribute, long value) {
@@ -13,7 +12,7 @@ public class Statistics {
         return this;
     }
 
-    public void populate(Statistics statistics) {
+    public void merge(Statistics statistics) {
         statistics.getOccurrences().forEach((key, value) -> this.getOccurrences().merge(key, value, Long::sum));
     }
 

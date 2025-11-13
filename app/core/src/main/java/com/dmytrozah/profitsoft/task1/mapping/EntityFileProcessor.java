@@ -2,12 +2,12 @@ package com.dmytrozah.profitsoft.task1.mapping;
 
 import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.Book;
-import com.dmytrozah.profitsoft.task1.core.entities.BookFactory;
 import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.Statistics;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsExport;
 import com.dmytrozah.profitsoft.task1.mapping.exception.MalformedBookshelf;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,24 +18,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class EntityFileProcessor {
-
-    static final ObjectMapper JSON_MAPPER = new ObjectMapper();
+    static final ObjectMapper JSON_MAPPER = new ObjectMapper()
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     static final XmlMapper XML_MAPPER = new XmlMapper();
 
-    static final Map<String, Bookshelf> CACHE = new HashMap<>();
-
     static final String EXPORT_FILE_SUFFIX = "statistics_by_";
 
-    private final BookFactory bookFactory = new BookFactory();
+    static Map<String, Bookshelf> cache = new ConcurrentHashMap<>();
 
     private ExecutorService executor;
 
@@ -50,19 +45,14 @@ public class EntityFileProcessor {
     private StatisticsAttributeType attributeType;
 
     /**
-     *
      * @param statisticsService - an instance of {@link StatisticsService}
      * @param base - base directory
-     * @param attributeType - an inner attribute type
      * @param threads - number of threads for the processing of files.
      */
 
-    public void init(final StatisticsService statisticsService,
-                     final String base,
-                     final StatisticsAttributeType attributeType,
-                     int threads) {
+    public void init(final StatisticsService statisticsService, final String base, int threads) {
         this.statisticsService = statisticsService;
-        this.attributeType = attributeType;
+        this.attributeType = statisticsService.getAttributeType();
 
         this.inputDir = Paths.get(base, "/input/");
         this.outputDir = Paths.get(base, "/output/");
@@ -78,8 +68,17 @@ public class EntityFileProcessor {
 
     /**
      * Process input files with a statistic generation over the input data and then generating entities.
-     *
      * @param outputConsumer - output consuming instance.
+     */
+
+    public void processInputFiles(final Consumer<List<Bookshelf>> outputConsumer){
+        processInputFiles(outputConsumer, null);
+    }
+
+    /**
+     * Process input files with a latch, counting each time an entity {@link Bookshelf} is processed.
+     * @param outputConsumer - output consuming instance.
+     * @implNote A latch is used for the benchmarking purposes and should be deleted on release.
      */
 
     public void processInputFiles(final Consumer<List<Bookshelf>> outputConsumer,
@@ -105,15 +104,14 @@ public class EntityFileProcessor {
                         if (ex != null) {
                             throw new RuntimeException(ex);
                         } else {
-                            result.forEach(b -> CACHE.put(b.getPath(), b));
-                            outputConsumer.accept(result);
+                            result.forEach(b -> cache.put(b.getPath(), b));
+
+                            if (outputConsumer != null) {
+                                outputConsumer.accept(result);
+                            }
 
                             if (latch != null) {
-                                try {
-                                    latch.countDown();
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
-                                }
+                                latch.countDown();
                             }
                         }
                     });
@@ -123,16 +121,20 @@ public class EntityFileProcessor {
                             .map(this::readBookshelf)
                             .toList();
 
-                    bookshelves.forEach((bookshelf) -> CACHE.put(bookshelf.getPath(), bookshelf));
+                    bookshelves.forEach((bookshelf) -> cache.put(bookshelf.getPath(), bookshelf));
 
-                    if (outputConsumer != null)
+                    if (outputConsumer != null) {
                         outputConsumer.accept(bookshelves);
+                    }
 
-                    if (latch != null)
+                    if (latch != null) {
                         latch.countDown();
+                    }
                 }
 
+
             }
+
         } catch (IOException e) {
             System.out.println("Error while getting the book shelves: " + e.getMessage());
             throw new RuntimeException(e);
@@ -145,6 +147,7 @@ public class EntityFileProcessor {
         final ArrayList<Map.Entry<String, Long>> sortedOccurrences = new ArrayList<>(
                         aggregated.getOccurrences().entrySet()
         );
+
         sortedOccurrences.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
 
         final StatisticsExport export = StatisticsExport.ofEntryList(sortedOccurrences);
@@ -161,13 +164,23 @@ public class EntityFileProcessor {
         final Path path = Paths.get(bookshelf.getPath());
 
         try (MappingIterator<JsonNode> mappingIterator = JSON_MAPPER.readerFor(JsonNode.class).readValues(path.toFile())) {
-            for (int i = 0; i < limit; i++) {
+            for (int i = 1; i <= limit && mappingIterator.hasNext(); i++) {
                 final JsonNode node = mappingIterator.nextValue();
 
-                books.add(bookFactory.createBook(node));
+                if (node == null) {
+                    return books;
+                }
+
+                Book book = JSON_MAPPER.readValue(node.toString(), Book.class);
+
+                if (book == null) {
+                    continue;
+                }
+
+                books.add(book);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return List.of();
         }
 
         return books;
@@ -205,6 +218,10 @@ public class EntityFileProcessor {
 
     public int getThreads() {
         return threads;
+    }
+
+    public Map<String, Bookshelf> getCache() {
+        return cache;
     }
 
     public void shutdown() {

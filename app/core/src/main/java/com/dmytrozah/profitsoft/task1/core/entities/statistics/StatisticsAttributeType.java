@@ -4,19 +4,25 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum StatisticsAttributeType {
+    TITLE("title", false),
 
-    TITLE("title"),
+    GENRE("genre", true),
 
-    GENRE("genre"),
+    AUTHOR("author", false),
 
-    AUTHOR("author"),
-
-    YEAR_PUBLISHED("year_published");
+    YEAR_PUBLISHED("year_published", false);
 
     private final String key;
 
-    StatisticsAttributeType(String key) {
+    /**
+     * Whether the field is comma separated
+     */
+
+    private final boolean cs;
+
+    StatisticsAttributeType(String key, boolean cs) {
         this.key = key;
+        this.cs = cs;
     }
 
     public String getKey() {
@@ -27,5 +33,9 @@ public enum StatisticsAttributeType {
         return Arrays.stream(StatisticsAttributeType.values())
                 .filter(t -> t.getKey().equals(key))
                 .findFirst();
+    }
+
+    public boolean isCommaSeparated() {
+        return cs;
     }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bookshelf {
-
     private String path;
 
     private List<Book> books = new ArrayList<>();

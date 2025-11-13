@@ -1,9 +1,8 @@
 package com.dmytrozah.profitsoft.task1;
 
-import com.dmytrozah.profitsoft.task1.core.BookService;
+import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
-import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import org.apache.commons.cli.*;
 
 import java.nio.file.Path;
@@ -67,28 +66,26 @@ public class Main {
 
             final StatisticsService statisticsService = new StatisticsService(attributeType);
 
-            final BookService bookService = new BookService(FILE_PROCESSOR);
-            final ConsoleInteractor interactor = new ConsoleInteractor(
+           final ConsoleInteractor interactor = new ConsoleInteractor(
                     Path.of(directory),
+                    FILE_PROCESSOR,
                     attributeType,
-                    bookService,
                     statisticsService
             );
 
             FILE_PROCESSOR.init(
                     statisticsService,
                     directory,
-                    attributeType,
                     commandLine.hasOption(THREADS_OPTION) ?
                             Integer.parseInt(commandLine.getOptionValue(THREADS_OPTION)) : -1
             );
 
-            FILE_PROCESSOR.processInputFiles((__) -> {
+            FILE_PROCESSOR.processInputFiles((output) -> {
                 try {
                     FILE_PROCESSOR.processOutputFiles();
                     FILE_PROCESSOR.shutdown();
 
-                    interactor.run();
+                    interactor.accept(output);
                 } catch (Exception e) {
                     throw new RuntimeException("There was an error during the processing of files.", e);
                 }

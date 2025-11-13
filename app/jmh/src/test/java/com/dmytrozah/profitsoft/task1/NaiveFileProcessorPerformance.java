@@ -18,19 +18,16 @@ public class NaiveFileProcessorPerformance {
 
             processor.init(statisticsService,
                     "./data/mediocre/",
-                    type,
                     threadCount
             );
 
             processor.init(statisticsService,
                     "./data/mediocre/",
-                    type,
                     threadCount
             );
 
             processor.init(statisticsService,
                     "./data/mediocre/",
-                    type,
                     threadCount
             );
 
@@ -49,7 +46,6 @@ public class NaiveFileProcessorPerformance {
             processor = new EntityFileProcessor();
             processor.init(statisticsService,
                     "./data/mediocre/",
-                    type,
                     threadCount
             );
 

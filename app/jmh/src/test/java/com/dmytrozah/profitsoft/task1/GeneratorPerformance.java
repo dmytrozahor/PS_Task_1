@@ -1,9 +1,9 @@
 package com.dmytrozah.profitsoft.task1;
 
-import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
-import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
-import com.dmytrozah.profitsoft.task1.mapping.statistics.StatisticsGenerator;
 import com.dmytrozah.profitsoft.task1.core.StatisticsService;
+import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
+import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
+import com.dmytrozah.profitsoft.task1.mapping.statistics.StatisticsGenerator;
 import org.openjdk.jmh.annotations.*;
 
 import java.nio.file.Path;

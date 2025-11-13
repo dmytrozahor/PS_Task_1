@@ -30,7 +30,6 @@ public class FileProcessorPerformanceOverhead {
 
         entityFileProcessor.init(statisticsService,
                 "./data/mediocre/",
-                type,
                 Runtime.getRuntime().availableProcessors() + 1
         );
     }

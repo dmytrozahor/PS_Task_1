@@ -34,7 +34,6 @@ public class FileProcessorPerformance {
 
         entityFileProcessor.init(statisticsService,
                 "./data/mediocre/",
-                type,
                 threads
         );
     }

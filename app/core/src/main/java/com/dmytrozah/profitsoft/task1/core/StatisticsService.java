@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class StatisticsService {
-
     private final Map<Bookshelf, Statistics> statistics = new ConcurrentHashMap<>();
 
     private final StatisticsGenerator generator;
@@ -33,11 +32,11 @@ public class StatisticsService {
     public Statistics getAggregatedStatistics() {
         if (aggregatedStatistics == null) {
             aggregatedStatistics = new Statistics();
-        }
 
-        statistics.values().forEach((statistics) -> {
-            aggregatedStatistics.populate(statistics);
-        });
+            statistics.values().forEach((statistics) -> {
+                aggregatedStatistics.merge(statistics);
+            });
+        }
 
         return aggregatedStatistics;
     }
@@ -50,4 +49,7 @@ public class StatisticsService {
         return statistics.get(bookshelf);
     }
 
+    public StatisticsAttributeType getAttributeType() {
+        return attributeType;
+    }
 }

@@ -1,33 +1,8 @@
 package com.dmytrozah.profitsoft.task1.core.entities;
 
-public class Book {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    private String title;
-
-    private BookAuthor author;
-
-    public Book(String title, BookAuthor author) {
-        this.title = title;
-        this.author = author;
-    }
-
-    public Book() {
-
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public BookAuthor getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(BookAuthor author) {
-        this.author = author;
-    }
-}
+public record Book(@JsonProperty("title") String title,
+                   @JsonProperty("author") String author,
+                   @JsonProperty("year_published") int yearPublished)
+{ }

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class StatisticsTest {
 
     /**
-     * Tests, whether {@link Statistics#populate(Statistics)} is merging statistics correctly
+     * Tests, whether {@link Statistics#merge(Statistics)} is merging statistics correctly
      */
 
     @Test
@@ -19,7 +19,7 @@ public class StatisticsTest {
         first.increaseOccurrences("test", 1L);
         second.increaseOccurrences("test", 1L);
 
-        first.populate(second);
+        first.merge(second);
 
         assertEquals(2, first.getOccurrences().get("test"));
     }

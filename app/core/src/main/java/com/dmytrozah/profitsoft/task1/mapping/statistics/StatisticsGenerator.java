@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class StatisticsGenerator {
-
     static final ObjectMapper MAPPER = new ObjectMapper();
 
     public Statistics generate(final StatisticsService service,
@@ -59,10 +58,11 @@ public class StatisticsGenerator {
                         continue;
                     }
 
-                    statistics = switch (attribute) {
-                        case GENRE -> populateGenreStatistics(statistics, textValue);
-                        default -> statistics.increaseOccurrences(textValue, 1);
-                    };
+                    if (attribute.isCommaSeparated()) {
+                        statistics = populateCommaSeparatedStatistics(textValue, statistics);
+                    } else {
+                        statistics = statistics.increaseOccurrences(textValue, 1);
+                    }
 
                     parser.nextToken();
                 }
@@ -74,8 +74,8 @@ public class StatisticsGenerator {
         return statistics;
     }
 
-    protected Statistics populateGenreStatistics(final Statistics statistics, final String genresField){
-        final String[] genres = genresField.split(", ");
+    protected Statistics populateCommaSeparatedStatistics(final String csField, final Statistics statistics){
+        final String[] genres = csField.split(", ");
 
         for (String genre : genres) {
             statistics.increaseOccurrences(genre, 1L);
