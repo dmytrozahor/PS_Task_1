@@ -38,4 +38,4 @@ Develop a console application that utilizes parsing capabilities of Java to pars
 | 8 threads                | 174,280 ± 13,457 ops/s                                  | 364,266 file / s                               | 
 | 7 threads = files number | 181,748 ± 2,900 ops/s                                   | 263,422 file / s                               |
 
-- Make sure to run the `core` project from a corresponding `working directory`. Otherwise the program would not find the
+- Make sure to run the `core` project from a corresponding `working directory`. Otherwise the program would not find the needed files.
