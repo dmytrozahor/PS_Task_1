@@ -20,7 +20,7 @@ public class GeneratorPerformance {
     private final StatisticsService statisticsService = new StatisticsService(StatisticsAttributeType.TITLE);
     private final StatisticsGenerator statisticsGenerator = new StatisticsGenerator();
 
-    static final Path BOOKSHELF_PATH = Paths.get("data/mediocre/input/mediocre_bookshelf.json");
+    static final Path BOOKSHELF_PATH = Paths.get("./data/mediocre/input/mediocre_bookshelf.json");
     static final Bookshelf MEDIOCRE_BOOKSHELF = new Bookshelf(BOOKSHELF_PATH.toString());
 
     @Benchmark

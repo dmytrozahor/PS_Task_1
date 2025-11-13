@@ -1,13 +1,12 @@
 package com.dmytrozah.profitsoft.task1.mapping;
 
-import com.dmytrozah.profitsoft.task1.core.entities.BookAuthor;
+import com.dmytrozah.profitsoft.task1.core.StatisticsService;
+import com.dmytrozah.profitsoft.task1.core.entities.Book;
 import com.dmytrozah.profitsoft.task1.core.entities.BookFactory;
+import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.Statistics;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
-import com.dmytrozah.profitsoft.task1.core.entities.Book;
-import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsExport;
-import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.mapping.exception.MalformedBookshelf;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -42,64 +41,52 @@ public class EntityFileProcessor {
 
     private StatisticsService statisticsService;
 
+    private Path inputDir;
+
+    private Path outputDir;
+
+    private int threads;
+
+    private StatisticsAttributeType attributeType;
+
     /**
      *
      * @param statisticsService - an instance of {@link StatisticsService}
      * @param base - base directory
      * @param attributeType - an inner attribute type
      * @param threads - number of threads for the processing of files.
-     * @param interactionRunnable - in case the program should have a console input
      */
 
     public void init(final StatisticsService statisticsService,
                      final String base,
                      final StatisticsAttributeType attributeType,
-                     int threads,
-                     final Runnable interactionRunnable, final CountDownLatch latch) {
+                     int threads) {
         this.statisticsService = statisticsService;
+        this.attributeType = attributeType;
 
-        final Path inputDir = Paths.get(base, "/input/");
-        final Path outputDir = Paths.get(base, "/output/");
+        this.inputDir = Paths.get(base, "/input/");
+        this.outputDir = Paths.get(base, "/output/");
 
         if (threads == -1 || threads > Runtime.getRuntime().availableProcessors()) {
-            threads = determineDefaultThreads(inputDir);
+            this.threads = determineDefaultThreads(inputDir);
+        } else {
+            this.threads = threads;
         }
 
         this.executor = Executors.newFixedThreadPool(threads);
-
-        this.processInputFiles(inputDir, threads > 1, (__) -> {
-            this.processOutputFiles(outputDir, attributeType);
-
-            if (interactionRunnable != null) {
-                interactionRunnable.run();
-            }
-        }, latch);
-
-        executor.shutdown();
-    }
-
-    public void init(final StatisticsService statisticsService,
-                     final String base,
-                     final StatisticsAttributeType attributeType,
-                     int threads, final CountDownLatch latch){
-        init(statisticsService, base, attributeType, threads, null, latch);
     }
 
     /**
      * Process input files with a statistic generation over the input data and then generating entities.
      *
-     * @param inputDirectory - input directory.
-     * @param async - whether the method should run in async.
      * @param outputConsumer - output consuming instance.
      */
 
-    public void processInputFiles(final Path inputDirectory,
-                                  final boolean async,
-                                  final Consumer<List<Bookshelf>> outputConsumer,
+    public void processInputFiles(final Consumer<List<Bookshelf>> outputConsumer,
                                   final CountDownLatch latch) {
         try {
-            try (Stream<Path> pathStream = Files.list(inputDirectory)) {
-                if (async) {
+            try (Stream<Path> pathStream = Files.list(inputDir)) {
+                if (threads > 1) {
                     final List<CompletableFuture<Bookshelf>> tasks = pathStream
                             .filter(file -> !Files.isDirectory(file))
                             .map(file -> CompletableFuture
@@ -115,15 +102,19 @@ public class EntityFileProcessor {
                             );
 
                     allTasks.whenComplete((result, ex) -> {
-                        try {
-                            if (ex != null) {
-                                ex.printStackTrace();
-                            } else {
-                                result.forEach(b -> CACHE.put(b.getPath(), b));
-                                outputConsumer.accept(result);
+                        if (ex != null) {
+                            throw new RuntimeException(ex);
+                        } else {
+                            result.forEach(b -> CACHE.put(b.getPath(), b));
+                            outputConsumer.accept(result);
+
+                            if (latch != null) {
+                                try {
+                                    latch.countDown();
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
                             }
-                        } finally {
-                            latch.countDown();
                         }
                     });
                 } else {
@@ -132,12 +123,13 @@ public class EntityFileProcessor {
                             .map(this::readBookshelf)
                             .toList();
 
-                    bookshelves.forEach((bookshelf) -> {
-                        CACHE.put(bookshelf.getPath(), bookshelf);
-                    });
+                    bookshelves.forEach((bookshelf) -> CACHE.put(bookshelf.getPath(), bookshelf));
 
-                    outputConsumer.accept(bookshelves);
-                    latch.countDown();
+                    if (outputConsumer != null)
+                        outputConsumer.accept(bookshelves);
+
+                    if (latch != null)
+                        latch.countDown();
                 }
 
             }
@@ -147,9 +139,7 @@ public class EntityFileProcessor {
         }
     }
 
-    public void processOutputFiles(final Path outputDirectory,
-                                   final StatisticsAttributeType attributeType)
-    {
+    public void processOutputFiles() {
         final Statistics aggregated = this.statisticsService.getAggregatedStatistics();
 
         final ArrayList<Map.Entry<String, Long>> sortedOccurrences = new ArrayList<>(
@@ -160,7 +150,7 @@ public class EntityFileProcessor {
         final StatisticsExport export = StatisticsExport.ofEntryList(sortedOccurrences);
 
         XML_MAPPER.writerWithDefaultPrettyPrinter()
-                .writeValue(outputDirectory.resolve(EXPORT_FILE_SUFFIX + attributeType.getKey() + ".xml"), export);
+                .writeValue(outputDir.resolve(EXPORT_FILE_SUFFIX + attributeType.getKey() + ".xml"), export);
     }
 
     public List<Book> extractBooks(final Bookshelf bookshelf, final long limit){
@@ -213,4 +203,11 @@ public class EntityFileProcessor {
         }
     }
 
+    public int getThreads() {
+        return threads;
+    }
+
+    public void shutdown() {
+        this.executor.shutdown();
+    }
 }

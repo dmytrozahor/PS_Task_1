@@ -1,6 +1,5 @@
 package com.dmytrozah.profitsoft.task1;
 
-
 import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
@@ -15,10 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Fork(2)
 @Warmup(iterations = 5, time = 2)
 @Measurement(iterations = 5, time = 3)
-public class FileProcessorPerformance {
-    @SuppressWarnings("unused")
-    @Param({"1", "2", "4", "8", "7", "16"})
-    private int threads;
+public class FileProcessorPerformanceOverhead {
 
     @SuppressWarnings("unused")
     @Param({"GENRE"})
@@ -35,12 +31,17 @@ public class FileProcessorPerformance {
         entityFileProcessor.init(statisticsService,
                 "./data/mediocre/",
                 type,
-                threads
+                Runtime.getRuntime().availableProcessors() + 1
         );
     }
 
+
+    /**
+     * Optionally test the performance with a thread overhead.
+     */
+
     @Benchmark
-    public void processMediocreFile() throws InterruptedException {
+    public void processMediocreFileWithContextSwitch() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
         entityFileProcessor.processInputFiles(
@@ -48,15 +49,8 @@ public class FileProcessorPerformance {
                 latch
         );
 
-        latch.await();
-    }
-
-    @TearDown(Level.Trial)
-    public void shutdownProcessor(){
-        try {
-            entityFileProcessor.shutdown();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (!latch.await(3, TimeUnit.SECONDS)){
+            throw new RuntimeException("Failed to wait for mediocre file to finish");
         }
     }
 }

@@ -80,10 +80,21 @@ public class Main {
                     directory,
                     attributeType,
                     commandLine.hasOption(THREADS_OPTION) ?
-                            Integer.parseInt(commandLine.getOptionValue(THREADS_OPTION)) : -1,
-                    interactor,
-                    latch
+                            Integer.parseInt(commandLine.getOptionValue(THREADS_OPTION)) : -1
             );
+
+            FILE_PROCESSOR.processInputFiles((__) -> {
+                try {
+                    FILE_PROCESSOR.processOutputFiles();
+                    FILE_PROCESSOR.shutdown();
+
+                    interactor.run();
+                } catch (Exception e) {
+                    throw new RuntimeException("There was an error during the processing of files.", e);
+                }
+
+            }, latch);
+
         } catch (ParseException e) {
             System.err.println("Error while parsing command line arguments: " + e.getMessage());
             throw new RuntimeException(e);

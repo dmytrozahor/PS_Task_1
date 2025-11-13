@@ -20,22 +20,29 @@ Develop a console application that utilizes parsing capabilities of Java to pars
 
 ### Implementation
 
-- Following entities were introduced: `Bookshelf`, `Book`, `BookAuthor`, `Statistics` ,  
+- Following entities were introduced: `Bookshelf`, `Book`, `BookAuthor`, `Statistics`. Although existence of all entities other than Bookshelf seems to be not necessary for the task resolution.  
 - Leveraged `JsonParser` from the `Jackson JSON` library to read attributes in a lazy fashion.
 - Leveraged `Apache Commons CLI` to provide a convenient way to control the program startup.
 - `Architectural layers`, `Decoupling`, `SOLID` were maintained to provide a clear structure of the application. `*` In particular was developed modular structure with the usage of `Gradle` to separate benchmarks (`jmh`) and main program (`core`) logic
 
+### Building the application
+Use the task `fatJar` in the `core` module or select the `./app/core` as your working directory and run it from the IDE.
+
 ### Notes
 - Two `Python` scripts were written to populate mock entities for the benchmarks with a `mediocre` data and a `large` data. They are located in the the underlying [JMH module](./app/jmh)
-- The necessary input data located in the `core` [module](./app/core/data) and the artifacts in the [build folder](./app/core/build) (after the compilation using `gradle build`)
+- The necessary input data located in the `core` [module](./app/core/data) and the artifacts in the [build folder](./app/core/build) (after the compilation using `gradle fatJar`)
 - `JMH` was used for more precise benchmarks on the file processing time with multithreading and without it, but the naive calculation is also present below:
 
-| Execution type           | Execution time (JMH, for `genre` extraction, throughput) | Execution time (Naive, for `genre` extraction) |
-|--------------------------|---------------------------------------------------------|------------------------------------------------|
-| 1 thread                 | 59,980 ± 3,189 ops/s                                        | 310,298 file / s                               | 
-| 2 threads                | 92,367 ± 18,198 ops/s                                   | 330,555 file / s                               |
-| 4 threads                | 161,969 ± 17,437 ops/s                                  | 212,195 file / s                               |
-| 8 threads                | 174,280 ± 13,457 ops/s                                  | 364,266 file / s                               | 
-| 7 threads = files number | 181,748 ± 2,900 ops/s                                   | 263,422 file / s                               |
+| Execution type                     | Execution time (JMH, for `genre` extraction, throughput) | Execution time (Naive, for `genre` extraction) |
+|------------------------------------|----------------------------------------------------------|------------------------------------------------|
+| 1 thread                           | 16,803 ± 2,876 ms/op                                     | 1.72074 ms                                     | 
+| 2 threads                          | 8,507 ± 0,132  ms/op                                     | 0.90867 ms                                      |
+| 4 threads                          | 5,936 ± 1,310  ms/op                                     | 0.60506 ms                                     |
+| 8 threads                          | 5,523 ± 1,468  ms/op                                     | 0.50803 ms                                      | 
+| 7 threads = files number           | 4,485 ± 0,088  ms/op                                     | 0.54912 ms                                     |
+| 16 threads                         | 4,716 ± 0,093 ms/op                                      | 0.49761 ms                                     | 
+| (processor cores + 1) threads      | 4,983 ± 0,445 ms/op                                      | 0.49548 ms                                               |
+
+So essentially we could conclude, that for each increase of threads we get a slightly better overall execution time. However in the case of an overhead (providing more threads than amount of the processor clear) we would expect to "naive" get slower (which is clear not the case in the "naive" data) because of the context switching and other side effects.
 
 - Make sure to run the `core` project from a corresponding `working directory`. Otherwise the program would not find the needed files.

@@ -4,36 +4,71 @@ import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
 
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 
 public class NaiveFileProcessorPerformance {
 
-    public static void main(String[] args) throws InterruptedException {
-        int threads = 7;
-        int files = 7;
+    public static void main(String[] args) throws Exception {
+        int[] threadCounts = {1, 2, 4, 8, 7, 16, Runtime.getRuntime().availableProcessors() + 1};
 
-        CountDownLatch latch = new CountDownLatch(1);
-        StatisticsAttributeType type = StatisticsAttributeType.valueOf("GENRE");
-        StatisticsService statisticsService = new StatisticsService(type);
-        EntityFileProcessor processor = new EntityFileProcessor();
+        for (int threadCount : threadCounts) {
+           StatisticsAttributeType type = StatisticsAttributeType.valueOf("GENRE");
+            StatisticsService statisticsService = new StatisticsService(type);
+            EntityFileProcessor processor = new EntityFileProcessor();
 
-        processor.init(statisticsService, "./data/mediocre/", type, threads, latch);
+            processor.init(statisticsService,
+                    "./data/mediocre/",
+                    type,
+                    threadCount
+            );
 
-        for (int i = 0; i < 5; i++) {
-                processor.processInputFiles(Path.of("./data/mediocre/input/"), false, (v) -> {}, new CountDownLatch(files)); // Warming up
+            processor.init(statisticsService,
+                    "./data/mediocre/",
+                    type,
+                    threadCount
+            );
+
+            processor.init(statisticsService,
+                    "./data/mediocre/",
+                    type,
+                    threadCount
+            );
+
+            // Some kind of warm-up task
+            for (int i = 0; i < 50; i++) {
+                CountDownLatch latch = new CountDownLatch(1);
+
+                processor.processInputFiles(
+                        (v) -> {},
+                        latch
+                );
+
+                latch.await();
+            }
+
+            processor = new EntityFileProcessor();
+            processor.init(statisticsService,
+                    "./data/mediocre/",
+                    type,
+                    threadCount
+            );
+
+            final long start = System.nanoTime();
+            CountDownLatch latch = new CountDownLatch(1);
+
+            processor.processInputFiles(
+                    (v) -> {},
+                    latch
+            );
+
+            latch.await();
+
+            double elapsedTime = (System.nanoTime() - start) / 10e6;
+
+            System.out.println("For " + threadCount + " the execution time was: " + elapsedTime + " ms");
+
+            processor.shutdown();
         }
-
-        final long start = System.nanoTime();
-
-        processor.init(statisticsService, "./data/mediocre/", type, threads, latch);
-
-        latch.await();
-
-        double elapsedSec = (System.nanoTime() - start) / 1_000_000_000.0;
-        double throughput = 7 / elapsedSec;
-
-        System.out.println(throughput + "file / sec");
     }
 
 }

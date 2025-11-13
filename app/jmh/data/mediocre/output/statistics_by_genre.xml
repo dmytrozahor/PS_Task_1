@@ -1,122 +1,122 @@
 <statistics>
   <item>
     <value>Tragedy</value>
-    <count>45123</count>
+    <count>5392</count>
   </item>
   <item>
     <value>Gothic</value>
-    <count>44252</count>
-  </item>
-  <item>
-    <value>Romance</value>
-    <count>44101</count>
+    <count>5286</count>
   </item>
   <item>
     <value>Psychological</value>
-    <count>44089</count>
+    <count>5273</count>
+  </item>
+  <item>
+    <value>Romance</value>
+    <count>5271</count>
   </item>
   <item>
     <value>Adventure</value>
-    <count>43939</count>
+    <count>5256</count>
   </item>
   <item>
     <value>Historical</value>
-    <count>37114</count>
+    <count>4435</count>
   </item>
   <item>
     <value>Drama</value>
-    <count>36906</count>
+    <count>4409</count>
   </item>
   <item>
     <value>Philosophical</value>
-    <count>35937</count>
+    <count>4301</count>
   </item>
   <item>
     <value>Epic</value>
-    <count>34347</count>
+    <count>4109</count>
   </item>
   <item>
     <value>Science Fiction</value>
-    <count>27628</count>
+    <count>3298</count>
   </item>
   <item>
     <value>Social Commentary</value>
-    <count>27471</count>
+    <count>3281</count>
   </item>
   <item>
     <value>Dystopian</value>
-    <count>27259</count>
+    <count>3256</count>
   </item>
   <item>
     <value>Satire</value>
-    <count>26461</count>
+    <count>3155</count>
   </item>
   <item>
     <value>Absurdist</value>
-    <count>17413</count>
+    <count>2083</count>
   </item>
   <item>
     <value>War</value>
-    <count>17160</count>
+    <count>2048</count>
   </item>
   <item>
     <value>Fantasy</value>
-    <count>9375</count>
+    <count>1124</count>
   </item>
   <item>
     <value>Coming-of-age</value>
-    <count>9313</count>
+    <count>1111</count>
   </item>
   <item>
     <value>Realism</value>
-    <count>9313</count>
+    <count>1111</count>
   </item>
   <item>
     <value>Philosophy</value>
-    <count>9267</count>
+    <count>1106</count>
   </item>
   <item>
     <value>Stoicism</value>
-    <count>9267</count>
+    <count>1106</count>
   </item>
   <item>
     <value>Legal Story</value>
-    <count>9120</count>
-  </item>
-  <item>
-    <value>Political Fiction</value>
-    <count>8952</count>
+    <count>1090</count>
   </item>
   <item>
     <value>Bildungsroman</value>
-    <count>8945</count>
+    <count>1070</count>
+  </item>
+  <item>
+    <value>Political Fiction</value>
+    <count>1070</count>
   </item>
   <item>
     <value>Crime</value>
-    <count>8932</count>
-  </item>
-  <item>
-    <value>Family Saga</value>
-    <count>8895</count>
-  </item>
-  <item>
-    <value>Magical Realism</value>
-    <count>8895</count>
+    <count>1066</count>
   </item>
   <item>
     <value>Legal Thriller</value>
-    <count>8888</count>
+    <count>1066</count>
+  </item>
+  <item>
+    <value>Family Saga</value>
+    <count>1061</count>
+  </item>
+  <item>
+    <value>Magical Realism</value>
+    <count>1061</count>
   </item>
   <item>
     <value>Allegory</value>
-    <count>8824</count>
+    <count>1055</count>
   </item>
   <item>
     <value>Controversial</value>
-    <count>8737</count>
+    <count>1044</count>
   </item>
   <item>
     <value>Horror</value>
-    <count>8424</count>
+    <count>1004</count>
   </item>
 </statistics>
