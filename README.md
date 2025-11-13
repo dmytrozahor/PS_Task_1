@@ -34,15 +34,15 @@ Use the task `fatJar` in the `core` module or select the `./app/core` as your wo
 - The necessary input data located in the `core` [module](./app/core/data) and the artifacts in the [build folder](./app/core/build) (after the compilation using `gradle fatJar`)
 - `JMH` was used for more precise benchmarks on the file processing time with multithreading and without it, but the naive calculation is also present below:
 
-| Execution type                     | Execution time (JMH, for `genre` extraction, throughput) | Execution time (Naive, for `genre` extraction) |
-|------------------------------------|----------------------------------------------------------|------------------------------------------------|
-| 1 thread                           | 16,803 ± 2,876 ms/op                                     | 1.72074 ms                                     | 
-| 2 threads                          | 8,507 ± 0,132  ms/op                                     | 0.90867 ms                                      |
-| 4 threads                          | 5,936 ± 1,310  ms/op                                     | 0.60506 ms                                     |
-| 8 threads                          | 5,523 ± 1,468  ms/op                                     | 0.50803 ms                                      | 
-| 7 threads = files number           | 4,485 ± 0,088  ms/op                                     | 0.54912 ms                                     |
-| 16 threads                         | 4,716 ± 0,093 ms/op                                      | 0.49761 ms                                     | 
-| (processor cores + 1) threads      | 4,983 ± 0,445 ms/op                                      | 0.49548 ms                                               |
+| Execution type                     | Execution time (JMH, for `genre` extraction, avg time) | Execution time (Naive, for `genre` extraction) |
+|------------------------------------|--------------------------------------------------------|------------------------------------------------|
+| 1 thread                           | 16,803 ± 2,876 ms/op                                   | 1.72074 ms                                     | 
+| 2 threads                          | 8,507 ± 0,132  ms/op                                   | 0.90867 ms                                      |
+| 4 threads                          | 5,936 ± 1,310  ms/op                                   | 0.60506 ms                                     |
+| 8 threads                          | 5,523 ± 1,468  ms/op                                   | 0.50803 ms                                      | 
+| 7 threads = files number           | 4,485 ± 0,088  ms/op                                   | 0.54912 ms                                     |
+| 16 threads                         | 4,716 ± 0,093 ms/op                                    | 0.49761 ms                                     | 
+| (processor cores + 1) threads      | 4,983 ± 0,445 ms/op                                    | 0.49548 ms                                               |
 
 So essentially we could conclude, that for each increase of threads we get a slightly better overall execution time, which the data shows. However in the case of an overhead (providing more threads than amount of cores the processor has) we would expect the execution time to get slower (which is clearly not the case in the "naive" data) because of the context switching and other side effects.
 
