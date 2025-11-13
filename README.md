@@ -20,7 +20,7 @@ Develop a console application that utilizes parsing capabilities of Java to pars
 
 ### Implementation
 
-- Following entities were introduced: `Bookshelf`, `Book`, `BookAuthor`, `Statistics`. Although existence of all entities other than Bookshelf seems to be not necessary for the task resolution.  
+- Following entities were introduced: `Bookshelf`, `Book`, `Statistics`. Although existence of other POJO entities other than Bookshelf or Book seems to be not necessary for the task resolution.  
 - Leveraged `JsonParser` from the `Jackson JSON` library to read attributes in a lazy fashion.
 - Leveraged `Apache Commons CLI` to provide a convenient way to control the program startup.
 - `Architectural layers`, `Decoupling`, `SOLID` were maintained to provide a clear structure of the application. `*` In particular was developed modular structure with the usage of `Gradle` to separate benchmarks (`jmh`) and main program (`core`) logic
