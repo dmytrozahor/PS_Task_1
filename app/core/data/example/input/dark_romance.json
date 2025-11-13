@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Wuthering Heights",
+    "author": "Emily Brontë",
+    "year_published": 1847,
+    "genre": "Gothic, Dark Romance"
+  },
+  {
+    "title": "Rebecca",
+    "author": "Daphne du Maurier",
+    "year_published": 1938,
+    "genre": "Psychological Thriller, Dark Romance"
+  },
+  {
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "year_published": 1847,
+    "genre": "Gothic, Dark Romance"
+  },
+  {
+    "title": "Jane Eyre",
+    "author": "Charlotte Brontë",
+    "year_published": 1847,
+    "genre": "Gothic, Dark Romance"
+  },
+  {
+    "title": "The Phantom of the Opera",
+    "author": "Gaston Leroux",
+    "year_published": 1910,
+    "genre": "Gothic, Dark Romance"
+  },
+  {
+    "title": "Carmilla",
+    "author": "Sheridan Le Fanu",
+    "year_published": 1872,
+    "genre": "Horror, Dark Romance"
+  },
+  {
+    "title": "Jane Eyre1",
+    "author": "Charlotte Brontë",
+    "year_published": 1847,
+    "genre": "Gothic, Dark Romance"
+  }
+]

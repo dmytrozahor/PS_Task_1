@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+
+}
+
+group = 'com.dmytrozah.profitsoft'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    // https://mvnrepository.com/artifact/commons-cli/commons-cli
+    implementation("commons-cli:commons-cli:1.10.0")
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.1")
+
+    // https://mvnrepository.com/artifact/tools.jackson.dataformat/jackson-dataformat-xml
+    implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.2")
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task fatJar(type: Jar) {
+    archiveClassifier = 'all'
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+
+    // Handle duplicate entries (like module-info.class)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes 'Main-Class': 'com.dmytrozah.profitsoft.task1.Main'
+    }
+}
