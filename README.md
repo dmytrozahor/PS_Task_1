@@ -44,5 +44,5 @@ Use the task `fatJar` in the `core` module or select the `./app/core` as your wo
 | 16 threads                         | 4,716 ± 0,093 ms/op                                      | 0.49761 ms                                     | 
 | (processor cores + 1) threads      | 4,983 ± 0,445 ms/op                                      | 0.49548 ms                                               |
 
-So essentially we could conclude, that for each increase of threads we get a slightly better overall execution time, which the data shows. However in the case of an overhead (providing more threads than amount of the processor clear) we would expect the execution time to get slower (which is clearly not the case in the "naive" data) because of the context switching and other side effects.
+So essentially we could conclude, that for each increase of threads we get a slightly better overall execution time, which the data shows. However in the case of an overhead (providing more threads than amount of cores the processor has) we would expect the execution time to get slower (which is clearly not the case in the "naive" data) because of the context switching and other side effects.
 
