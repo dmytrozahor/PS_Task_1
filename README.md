@@ -47,9 +47,9 @@ Use the task `fatJar` in the `core` module or select the `./app/core` as your wo
 So essentially we could conclude, 
 that for each increase of threads (threads > 1) 
 we get a slightly better overall execution time (threads < processor cores), 
-which the data shows (except where the threads are equal with the file count) 
+which the data shows (except where the threads are equal with the file count).  
 
-And for the processor cores = threads we have the worst result, which can be explained with processing side effects, such as context-switching and too frequent L3 process access.
+And for the processor cores = threads we have one of the worst results, which can be explained with processing side effects, such as context-switching and too frequent L3 process access.
 
 The single thread execution stays the most optimal way for the objective.
 
