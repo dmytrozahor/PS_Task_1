@@ -1,6 +1,7 @@
 package com.dmytrozah.profitsoft.task1.core.entities.statistics;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,5 +24,17 @@ public class Statistics {
 
     public Map<String, Long> getOccurrences() {
         return occurrences;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Statistics that = (Statistics) o;
+        return Objects.equals(occurrences, that.occurrences);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(occurrences);
     }
 }

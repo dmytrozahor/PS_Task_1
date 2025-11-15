@@ -7,6 +7,7 @@ import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @JsonRootName("statistics")
 public record StatisticsExport(@JacksonXmlProperty(localName = "item")
@@ -23,5 +24,17 @@ public record StatisticsExport(@JacksonXmlProperty(localName = "item")
                 .toList();
 
         return new StatisticsExport(entries);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        StatisticsExport export = (StatisticsExport) o;
+        return Objects.equals(statistics, export.statistics);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(statistics);
     }
 }
