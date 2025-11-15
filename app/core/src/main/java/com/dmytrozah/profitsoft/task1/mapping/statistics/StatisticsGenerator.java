@@ -4,6 +4,7 @@ import com.dmytrozah.profitsoft.task1.core.entities.statistics.Statistics;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
+import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,15 +15,15 @@ import java.nio.file.Path;
 public class StatisticsGenerator {
     static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public Statistics generate(final StatisticsService service,
-                               final Bookshelf bookshelf,
-                               final Path path,
-                               final StatisticsAttributeType attribute)
+    public Statistics generate(
+            final EntityFSProvider fsProvider,
+            final StatisticsService service,
+            final Path path)
     {
-        Statistics statistics = service.getStatistics(bookshelf);
+        Statistics statistics = service.getStatistics(path);
 
         try {
-            try (final JsonParser parser = MAPPER.getFactory().createParser(path.toFile())) {
+            try (final JsonParser parser = MAPPER.getFactory().createParser(fsProvider.getInputStream(path))) {
 
                 JsonToken token = parser.nextToken();
 
@@ -37,7 +38,7 @@ public class StatisticsGenerator {
                         continue;
                     }
 
-                    if (!fieldName.equals(attribute.getKey())) {
+                    if (!fieldName.equals(service.getAttributeType().getKey())) {
                         continue;
                     }
 
@@ -58,7 +59,7 @@ public class StatisticsGenerator {
                         continue;
                     }
 
-                    if (attribute.isCommaSeparated()) {
+                    if (service.getAttributeType().isCommaSeparated()) {
                         statistics = populateCommaSeparatedStatistics(textValue, statistics);
                     } else {
                         statistics = statistics.increaseOccurrences(textValue, 1);

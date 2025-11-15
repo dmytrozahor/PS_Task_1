@@ -64,20 +64,19 @@ public class Main {
             final StatisticsAttributeType attributeType = StatisticsAttributeType.getByKey(attributeKey)
                     .orElseThrow(IllegalArgumentException::new);
 
-            final StatisticsService statisticsService = new StatisticsService(attributeType);
-
-           final ConsoleInteractor interactor = new ConsoleInteractor(
-                    Path.of(directory),
-                    FILE_PROCESSOR,
-                    attributeType,
-                    statisticsService
-            );
-
             FILE_PROCESSOR.init(
-                    statisticsService,
+                    attributeType,
                     directory,
                     commandLine.hasOption(THREADS_OPTION) ?
                             Integer.parseInt(commandLine.getOptionValue(THREADS_OPTION)) : -1
+            );
+
+
+            final ConsoleInteractor interactor = new ConsoleInteractor(
+                    Path.of(directory),
+                    FILE_PROCESSOR,
+                    attributeType,
+                    FILE_PROCESSOR.getStatisticsService()
             );
 
             FILE_PROCESSOR.processInputFiles((output) -> {

@@ -7,6 +7,8 @@ import com.dmytrozah.profitsoft.task1.core.entities.statistics.Statistics;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsExport;
 import com.dmytrozah.profitsoft.task1.mapping.exception.MalformedBookshelf;
+import com.dmytrozah.profitsoft.task1.mapping.reader.DefaultFSProvider;
+import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import tools.jackson.dataformat.xml.XmlMapper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,15 +47,32 @@ public class EntityFileProcessor {
 
     private StatisticsAttributeType attributeType;
 
+    private EntityFSProvider fsProvider;
+
     /**
-     * @param statisticsService - an instance of {@link StatisticsService}
+     * Introduced to make unit testing correctly and to ensure we are capable
+     * of different strategies to handle the files.
+     *
+     * @param customFileReader - custom reading logic for the files.
+     */
+
+    public EntityFileProcessor(final EntityFSProvider customFileReader){
+        this.fsProvider = customFileReader;
+    }
+
+    public EntityFileProcessor(){
+        this.fsProvider = new DefaultFSProvider();
+    }
+
+    /**
+     * @param attributeType - attribute to be analyzed on.
      * @param base - base directory
      * @param threads - number of threads for the processing of files.
      */
 
-    public void init(final StatisticsService statisticsService, final String base, int threads) {
-        this.statisticsService = statisticsService;
-        this.attributeType = statisticsService.getAttributeType();
+    public void init(final StatisticsAttributeType attributeType, final String base, int threads) {
+        this.attributeType = attributeType;
+        this.statisticsService = new StatisticsService(fsProvider, attributeType);
 
         this.inputDir = Paths.get(base, "/input/");
         this.outputDir = Paths.get(base, "/output/");
@@ -78,13 +98,14 @@ public class EntityFileProcessor {
     /**
      * Process input files with a latch, counting each time an entity {@link Bookshelf} is processed.
      * @param outputConsumer - output consuming instance.
+       @param latch - a latch introduced for the performance testing.
      * @implNote A latch is used for the benchmarking purposes and should be deleted on release.
      */
 
     public void processInputFiles(final Consumer<List<Bookshelf>> outputConsumer,
                                   final CountDownLatch latch) {
         try {
-            try (Stream<Path> pathStream = Files.list(inputDir)) {
+            try (Stream<Path> pathStream = fsProvider.listFiles(inputDir)) {
                 if (threads > 1) {
                     final List<CompletableFuture<Bookshelf>> tasks = pathStream
                             .filter(file -> !Files.isDirectory(file))
@@ -118,6 +139,7 @@ public class EntityFileProcessor {
                 } else {
                     final List<Bookshelf> bookshelves = pathStream
                             .filter(file -> !Files.isDirectory(file))
+                            .filter(path -> !cache.containsKey(path.toString()))
                             .map(this::readBookshelf)
                             .toList();
 
@@ -131,8 +153,6 @@ public class EntityFileProcessor {
                         latch.countDown();
                     }
                 }
-
-
             }
 
         } catch (IOException e) {
@@ -163,7 +183,15 @@ public class EntityFileProcessor {
         final List<Book> books = new ArrayList<>();
         final Path path = Paths.get(bookshelf.getPath());
 
-        try (MappingIterator<JsonNode> mappingIterator = JSON_MAPPER.readerFor(JsonNode.class).readValues(path.toFile())) {
+        InputStream inputStream;
+
+        try {
+            inputStream = fsProvider.getInputStream(path);
+        } catch (IOException e) {
+            throw new RuntimeException("There was a problem instantiating a file stream: " + e.getMessage());
+        }
+
+        try (MappingIterator<JsonNode> mappingIterator = JSON_MAPPER.readerFor(JsonNode.class).readValues(inputStream)) {
             for (int i = 1; i <= limit && mappingIterator.hasNext(); i++) {
                 final JsonNode node = mappingIterator.nextValue();
 
@@ -190,7 +218,7 @@ public class EntityFileProcessor {
         final Bookshelf bookshelf = new Bookshelf();
         bookshelf.setPath(path.toString());
 
-        this.statisticsService.analyze(bookshelf, path);
+        this.statisticsService.analyze(path);
 
         return bookshelf;
     }
@@ -226,5 +254,13 @@ public class EntityFileProcessor {
 
     public void shutdown() {
         this.executor.shutdown();
+    }
+
+    public EntityFSProvider getFSProvider() {
+        return fsProvider;
+    }
+
+    public StatisticsService getStatisticsService() {
+        return statisticsService;
     }
 }
