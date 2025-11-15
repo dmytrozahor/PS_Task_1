@@ -35,6 +35,8 @@ public class EntityFileProcessor {
 
     static Map<String, Bookshelf> cache = new ConcurrentHashMap<>();
 
+    private final EntityFSProvider fsProvider;
+
     private ExecutorService executor;
 
     private StatisticsService statisticsService;
@@ -46,8 +48,6 @@ public class EntityFileProcessor {
     private int threads;
 
     private StatisticsAttributeType attributeType;
-
-    private EntityFSProvider fsProvider;
 
     /**
      * Introduced to make unit testing correctly and to ensure we are capable

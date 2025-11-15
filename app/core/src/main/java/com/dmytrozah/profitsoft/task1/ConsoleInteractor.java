@@ -38,8 +38,7 @@ public class ConsoleInteractor implements Consumer<List<Bookshelf>> {
     public void accept(List<Bookshelf> initialList) {
         System.out.println("The statistics for the attribute " + attributeType.getKey() + " have been established.");
         System.out.println("You can find the generated output in the "
-                + dir +
-                "\\output\\statistics_by_" + attributeType.getKey() + ".xml"
+                + dir.resolve("output").resolve("statistics_by_" + attributeType.getKey() + ".xml")
         );
 
         System.out.println();
