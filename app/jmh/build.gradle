@@ -16,9 +16,6 @@ dependencies {
 
     implementation project(':app:core')
 
-    // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-annprocess
-    testAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.37")
-
     // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
     testImplementation("org.openjdk.jmh:jmh-core:1.37")
 }

@@ -1,7 +1,6 @@
 package com.dmytrozah.profitsoft.task1;
 
 
-import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
 import org.openjdk.jmh.annotations.*;
@@ -29,17 +28,17 @@ public class FileProcessorPerformance {
     @Setup(Level.Trial)
     public void setup() {
         StatisticsAttributeType type = StatisticsAttributeType.valueOf(attribute);
-        StatisticsService statisticsService = new StatisticsService(type);
         entityFileProcessor = new EntityFileProcessor();
 
-        entityFileProcessor.init(statisticsService,
+        entityFileProcessor.init(
+                type,
                 "./data/mediocre/",
                 threads
         );
     }
 
     @Benchmark
-    public void processMediocreFile() throws InterruptedException {
+    public void processMediocreFileInput() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(1);
 
         entityFileProcessor.processInputFiles(
@@ -49,6 +48,23 @@ public class FileProcessorPerformance {
 
         latch.await();
     }
+
+    /* It seems we apparently shouldn't benchmark the IO with JMH
+    However...
+
+    @Benchmark
+    public void processMediocreFileInputOutput() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        entityFileProcessor.processInputFiles(
+                (v) -> {},
+                latch
+        );
+
+        entityFileProcessor.processOutputFiles();
+
+        latch.await();
+    }*/
 
     @TearDown(Level.Trial)
     public void shutdownProcessor(){

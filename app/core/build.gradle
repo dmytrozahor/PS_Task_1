@@ -22,6 +22,12 @@ dependencies {
 
     // https://mvnrepository.com/artifact/tools.jackson.dataformat/jackson-dataformat-xml
     implementation("tools.jackson.dataformat:jackson-dataformat-xml:3.0.2")
+
+    // https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testImplementation("org.mockito:mockito-core:5.10.0")
+
+    // https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
+    testImplementation("org.mockito:mockito-junit-jupiter:5.10.0")
 }
 
 test {

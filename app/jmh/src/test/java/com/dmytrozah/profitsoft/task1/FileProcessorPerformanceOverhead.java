@@ -25,10 +25,9 @@ public class FileProcessorPerformanceOverhead {
     @Setup(Level.Trial)
     public void setup() {
         StatisticsAttributeType type = StatisticsAttributeType.valueOf(attribute);
-        StatisticsService statisticsService = new StatisticsService(type);
         entityFileProcessor = new EntityFileProcessor();
 
-        entityFileProcessor.init(statisticsService,
+        entityFileProcessor.init(type,
                 "./data/mediocre/",
                 Runtime.getRuntime().availableProcessors() + 1
         );
@@ -50,6 +49,15 @@ public class FileProcessorPerformanceOverhead {
 
         if (!latch.await(3, TimeUnit.SECONDS)){
             throw new RuntimeException("Failed to wait for mediocre file to finish");
+        }
+    }
+
+    @TearDown(Level.Trial)
+    public void shutdownProcessor(){
+        try {
+            entityFileProcessor.shutdown();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
