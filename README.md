@@ -34,20 +34,22 @@ Use the task `fatJar` in the `core` module or select the `./app/core` as your wo
 - The necessary input data located in the `core` [module](./app/core/data) and the artifacts in the [build folder](./app/core/build) (after the compilation using `gradle fatJar`)
 - `JMH` was used for more precise benchmarks on the file processing (Parsing-IO) time with multithreading and without it, but the naive calculation is also present below:
 
-| Execution type            | Execution time (JMH, for `genre` extraction, avg time) | Execution time (Naive, for `genre` extraction)                                                     |
-|---------------------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| 1 thread                  | 0,008 ±      0,001  ms/op                              | 0.06883 ms                                                                                         | 
-| 2 threads                 | 3,004 ±      0,061  ms/op                              | 0.37824 ms                                                                                         |
-| 4 threads                 | 3,218 ±      0,263  ms/op                              | 0.34431 ms                                                                                                  |
-| 8 threads                 | 3,311 ±      0,077  ms/op                              | 0.34656 ms                                                                                         | 
-| 7 threads = files number  | 3,376 ±      0,124  ms/op                              | 0.36191 ms                                                                                         |
-| 16 threads                | 3,366 ±      0,079  ms/op                              | 0.41862 ms                                                                                         | 
-| (processor cores) threads | 3,194 ±      0,187  ms/op                              | 0.33183 ms                                                                                         |
+| Execution type            | Execution time (JMH, for `genre` extraction, avg time with batching) | Execution time (Naive, for `genre` extraction, execution time with batching) |
+|---------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------|
+| 1 thread                  | 0,042 ±      0,002  ms/op                                            | 0.11286 ms                                                                   | 
+| 2 threads                 | 8,848 ±      1,828  ms/op                                            | 0.97284 ms                                                                   |
+| 4 threads                 | 5,017 ±      0,024  ms/op                                            | 0.57410 ms                                                                   |
+| 8 threads                 | 4,468 ±      0,120  ms/op                                            | 0.54069 ms                                                                   | 
+| 5 threads = files number  | 4,631 ±      0,076  ms/op                                            | 0.51681 ms                                                                   |
+| 16 threads                | 4,543 ±      0,087  ms/op                                            | 0.54040 ms                                                                   | 
+| (processor cores) threads | 4,588 ±      0,203  ms/op                                            | 0.91637 ms                                                                   |
 
 So essentially we could conclude, 
 that for each increase of threads (threads > 1) 
-we get a slightly better overall execution time, 
-which the data shows. The best possible time is at (processor cores) threads, which is unexpected behaviour (due to oft context-switching, etc.), but can be explained with the fact, that most of the parsing is highly CPU bound.
+we get a slightly better overall execution time (threads < processor cores), 
+which the data shows (except where the threads are equal with the file count) 
+
+And for the processor cores = threads we have the worst result, which can be explained with processing side effects, such as context-switching and too frequent L3 process access.
 
 The single thread execution stays the most optimal way for the objective.
 
