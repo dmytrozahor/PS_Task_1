@@ -8,6 +8,7 @@ import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import com.dmytrozah.profitsoft.task1.mapping.statistics.StatisticsGenerator;
 import org.openjdk.jmh.annotations.*;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
@@ -19,10 +20,18 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 5, timeUnit = TimeUnit.MILLISECONDS, time = 5000) // Optionally increase to 5 iterations
 public class GeneratorPerformance {
 
-    private final EntityFSProvider provider = new DefaultFSProvider();
-    private final StatisticsGenerator statisticsGenerator = new StatisticsGenerator();
+    private BenchFSProvider provider;
+    private StatisticsGenerator statisticsGenerator;
 
     static final Path BOOKSHELF_PATH = Paths.get("./data/mediocre/input/mediocre_bookshelve_1.json");
+
+    @Setup(Level.Trial)
+    public void loadFiles() throws IOException {
+        this.provider = new BenchFSProvider();
+        this.provider.readFiles();
+
+        this.statisticsGenerator = new StatisticsGenerator();
+    }
 
     @Benchmark
     public void mediocreTitle(){

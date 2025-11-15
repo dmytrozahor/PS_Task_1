@@ -3,8 +3,11 @@ package com.dmytrozah.profitsoft.task1;
 
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
+import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import org.openjdk.jmh.annotations.*;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -26,9 +29,13 @@ public class FileProcessorPerformance {
     private EntityFileProcessor entityFileProcessor;
 
     @Setup(Level.Trial)
-    public void setup() {
+    public void setup() throws IOException {
+        BenchFSProvider fsProvider = new BenchFSProvider();
+        fsProvider.readFiles();
+
         StatisticsAttributeType type = StatisticsAttributeType.valueOf(attribute);
-        entityFileProcessor = new EntityFileProcessor();
+
+        entityFileProcessor = new EntityFileProcessor(fsProvider);
 
         entityFileProcessor.init(
                 type,

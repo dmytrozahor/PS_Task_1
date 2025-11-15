@@ -8,27 +8,30 @@ import java.util.concurrent.CountDownLatch;
 public class NaiveFileProcessorPerformance {
 
     public static void main(String[] args) throws Exception {
-        int[] threadCounts = {1, 2, 4, 8, 7, 16, Runtime.getRuntime().availableProcessors() + 1};
+        int[] threadCounts = {1, 2, 4, 8, 7, 16, Runtime.getRuntime().availableProcessors()};
 
         System.out.println("Only input");
 
         // Input only
         for (int threadCount : threadCounts) {
             StatisticsAttributeType type = StatisticsAttributeType.valueOf("GENRE");
-            EntityFileProcessor processor = new EntityFileProcessor();
+            BenchFSProvider provider = new BenchFSProvider();
+            provider.readFiles();
+
+            EntityFileProcessor processor = new EntityFileProcessor(provider);
 
             processor.init(type,
-                    "./data/mediocre/",
+                    "./data/benchmark/",
                     threadCount
             );
 
             processor.init(type,
-                    "./data/mediocre/",
+                    "./data/benchmark/",
                     threadCount
             );
 
             processor.init(type,
-                    "./data/mediocre/",
+                    "./data/benchmark/",
                     threadCount
             );
 
@@ -44,9 +47,12 @@ public class NaiveFileProcessorPerformance {
                 latch.await();
             }
 
-            processor = new EntityFileProcessor();
+            provider = new BenchFSProvider();
+            provider.readFiles();
+
+            processor = new EntityFileProcessor(provider);
             processor.init(type,
-                    "./data/mediocre/",
+                    "./data/benchmark/",
                     threadCount
             );
 
@@ -124,9 +130,8 @@ public class NaiveFileProcessorPerformance {
             double elapsedTime = (System.nanoTime() - start) / 10e6;
 
             System.out.println("For " + threadCount + " the execution time was: " + elapsedTime + " ms");
-
-            processor.shutdown();
         }*/
+
     }
 
 }

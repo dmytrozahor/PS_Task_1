@@ -5,6 +5,8 @@ import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttribu
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
 import org.openjdk.jmh.annotations.*;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -23,13 +25,16 @@ public class FileProcessorPerformanceOverhead {
     private EntityFileProcessor entityFileProcessor;
 
     @Setup(Level.Trial)
-    public void setup() {
+    public void setup() throws IOException {
         StatisticsAttributeType type = StatisticsAttributeType.valueOf(attribute);
-        entityFileProcessor = new EntityFileProcessor();
+        BenchFSProvider fsProvider = new BenchFSProvider();
+        fsProvider.readFiles();
+
+        entityFileProcessor = new EntityFileProcessor(fsProvider);
 
         entityFileProcessor.init(type,
-                "./data/mediocre/",
-                Runtime.getRuntime().availableProcessors() + 1
+                "./data/benchmark/",
+                Runtime.getRuntime().availableProcessors()
         );
     }
 
