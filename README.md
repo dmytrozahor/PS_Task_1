@@ -24,6 +24,7 @@ Develop a console application that utilizes parsing capabilities of Java to pars
 - Leveraged `JsonParser` from the `Jackson JSON` library to read attributes in a lazy fashion.
 - Leveraged `Apache Commons CLI` to provide a convenient way to control the program startup.
 - `Architectural layers`, `Decoupling`, `SOLID` were maintained to provide a clear structure of the application. `*` In particular was developed modular structure with the usage of `Gradle` to separate benchmarks (`jmh`) and main program (`core`) logic
+- Test coverage with `JUnit 5` and `Mockito` was established as well.
 
 ### Building the application
 Use the task `fatJar` in the `core` module or select the `./app/core` as your working directory and run it from the IDE.
