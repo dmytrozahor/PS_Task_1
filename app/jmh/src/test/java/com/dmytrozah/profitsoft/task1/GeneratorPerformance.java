@@ -1,10 +1,7 @@
 package com.dmytrozah.profitsoft.task1;
 
 import com.dmytrozah.profitsoft.task1.core.StatisticsService;
-import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
-import com.dmytrozah.profitsoft.task1.mapping.reader.DefaultFSProvider;
-import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import com.dmytrozah.profitsoft.task1.mapping.statistics.StatisticsGenerator;
 import org.openjdk.jmh.annotations.*;
 
@@ -20,14 +17,14 @@ import java.util.concurrent.TimeUnit;
 @Warmup(iterations = 5, timeUnit = TimeUnit.MILLISECONDS, time = 5000) // Optionally increase to 5 iterations
 public class GeneratorPerformance {
 
-    private BenchFSProvider provider;
+    private BatchFSProvider provider;
     private StatisticsGenerator statisticsGenerator;
 
     static final Path BOOKSHELF_PATH = Paths.get("./data/mediocre/input/mediocre_bookshelve_1.json");
 
     @Setup(Level.Trial)
     public void loadFiles() throws IOException {
-        this.provider = new BenchFSProvider();
+        this.provider = new BatchFSProvider();
         this.provider.readFiles();
 
         this.statisticsGenerator = new StatisticsGenerator();

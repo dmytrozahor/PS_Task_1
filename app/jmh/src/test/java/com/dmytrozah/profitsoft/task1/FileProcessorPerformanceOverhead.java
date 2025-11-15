@@ -1,12 +1,10 @@
 package com.dmytrozah.profitsoft.task1;
 
-import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
 import org.openjdk.jmh.annotations.*;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +25,7 @@ public class FileProcessorPerformanceOverhead {
     @Setup(Level.Trial)
     public void setup() throws IOException {
         StatisticsAttributeType type = StatisticsAttributeType.valueOf(attribute);
-        BenchFSProvider fsProvider = new BenchFSProvider();
+        BatchFSProvider fsProvider = new BatchFSProvider();
         fsProvider.readFiles();
 
         entityFileProcessor = new EntityFileProcessor(fsProvider);

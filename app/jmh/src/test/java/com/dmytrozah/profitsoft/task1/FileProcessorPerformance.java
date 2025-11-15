@@ -3,11 +3,9 @@ package com.dmytrozah.profitsoft.task1;
 
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
-import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import org.openjdk.jmh.annotations.*;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -19,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Measurement(iterations = 5, time = 3)
 public class FileProcessorPerformance {
     @SuppressWarnings("unused")
-    @Param({"1", "2", "4", "8", "7", "16"})
+    @Param({"1", "2", "4", "8", "5", "16"})
     private int threads;
 
     @SuppressWarnings("unused")
@@ -30,7 +28,7 @@ public class FileProcessorPerformance {
 
     @Setup(Level.Trial)
     public void setup() throws IOException {
-        BenchFSProvider fsProvider = new BenchFSProvider();
+        BatchFSProvider fsProvider = new BatchFSProvider();
         fsProvider.readFiles();
 
         StatisticsAttributeType type = StatisticsAttributeType.valueOf(attribute);

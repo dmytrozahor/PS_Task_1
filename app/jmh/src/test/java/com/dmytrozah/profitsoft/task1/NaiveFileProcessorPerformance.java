@@ -8,14 +8,14 @@ import java.util.concurrent.CountDownLatch;
 public class NaiveFileProcessorPerformance {
 
     public static void main(String[] args) throws Exception {
-        int[] threadCounts = {1, 2, 4, 8, 7, 16, Runtime.getRuntime().availableProcessors()};
+        int[] threadCounts = {1, 2, 4, 8, 5, 16, Runtime.getRuntime().availableProcessors()};
 
         System.out.println("Only input");
 
         // Input only
         for (int threadCount : threadCounts) {
             StatisticsAttributeType type = StatisticsAttributeType.valueOf("GENRE");
-            BenchFSProvider provider = new BenchFSProvider();
+            BatchFSProvider provider = new BatchFSProvider();
             provider.readFiles();
 
             EntityFileProcessor processor = new EntityFileProcessor(provider);
@@ -47,7 +47,7 @@ public class NaiveFileProcessorPerformance {
                 latch.await();
             }
 
-            provider = new BenchFSProvider();
+            provider = new BatchFSProvider();
             provider.readFiles();
 
             processor = new EntityFileProcessor(provider);
