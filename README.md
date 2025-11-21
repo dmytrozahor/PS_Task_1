@@ -5,7 +5,7 @@
 ### Objective 
 Develop a console application that utilizes parsing capabilities of Java to parse multiple files of a given structure (**data domain**) and produce corresponding statistics over the usage of particular attributes in them.
 
-![img.png](img.png)
+![img.png](img/img.png)
 
 ### Requirements
 
@@ -25,6 +25,10 @@ Develop a console application that utilizes parsing capabilities of Java to pars
 - Leveraged `Apache Commons CLI` to provide a convenient way to control the program startup.
 - `Architectural layers`, `Decoupling`, `SOLID` were maintained to provide a clear structure of the application. `*` In particular was developed modular structure with the usage of `Gradle` to separate benchmarks (`jmh`) and main program (`core`) logic
 - Test coverage with `JUnit 5` and `Mockito` was established as well.
+
+### Dependency diagram (UML)
+
+![Dependency-UML.png](img/Dependency-UML.png)
 
 ### Building the application
 Use the task `fatJar` in the `core` module or select the `./app/core` as your working directory and run it from the IDE.
