@@ -26,10 +26,6 @@ Develop a console application that utilizes parsing capabilities of Java to pars
 - `Architectural layers`, `Decoupling`, `SOLID` were maintained to provide a clear structure of the application. `*` In particular was developed modular structure with the usage of `Gradle` to separate benchmarks (`jmh`) and main program (`core`) logic
 - Test coverage with `JUnit 5` and `Mockito` was established as well.
 
-### Dependency diagram (UML)
-
-![Dependency-UML.png](img/Dependency-UML.png)
-
 ### Building the application
 Use the task `fatJar` in the `core` module or select the `./app/core` as your working directory and run it from the IDE.
 
@@ -44,17 +40,19 @@ Use the task `fatJar` in the `core` module or select the `./app/core` as your wo
 | 1 thread                  | 0,042 ±      0,002  ms/op                                            | 0.11286 ms                                                                   | 
 | 2 threads                 | 8,848 ±      1,828  ms/op                                            | 0.97284 ms                                                                   |
 | 4 threads                 | 5,017 ±      0,024  ms/op                                            | 0.57410 ms                                                                   |
-| 8 threads                 | 4,468 ±      0,120  ms/op                                            | 0.54069 ms                                                                   | 
 | 5 threads = files number  | 4,631 ±      0,076  ms/op                                            | 0.51681 ms                                                                   |
+| 8 threads                 | 4,468 ±      0,120  ms/op                                            | 0.54069 ms                                                                   | 
 | 16 threads                | 4,543 ±      0,087  ms/op                                            | 0.54040 ms                                                                   | 
 | (processor cores) threads | 4,588 ±      0,203  ms/op                                            | 0.91637 ms                                                                   |
 
 So essentially we could conclude, 
-that for each increase of threads (threads > 1) 
-we get a slightly better overall execution time (threads < processor cores), 
-which the data shows (except where the threads are equal with the file count).  
+that for each increase of threads count (threads > 1) we get a slightly better overall execution time, 
+which the data shows.  
 
-And for the processor cores = threads we have one of the worst results, which can be explained with processing side effects, such as context-switching and too frequent L3 process access.
+And for the processor cores = threads we have a regression of the execution time, which can be explained with processing side effects, such as a context-switching and too frequent L3-cache processor access.
 
 The single thread execution stays the most optimal way for the objective.
 
+### Dependency diagram (UML)
+
+![Dependency-UML.png](img/Dependency-UML.png)
