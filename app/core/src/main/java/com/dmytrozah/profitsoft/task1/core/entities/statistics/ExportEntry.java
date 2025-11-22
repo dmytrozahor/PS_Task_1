@@ -12,16 +12,6 @@ public record ExportEntry(@JacksonXmlProperty(localName = "value") String value,
         this.count = count;
     }
 
-    @Override
-    public String value() {
-        return value;
-    }
-
-    @Override
-    public long count() {
-        return count;
-    }
-
     public static ExportEntry ofMapEntry(final Map.Entry<String, Long> entry) {
         return new ExportEntry(entry.getKey(), entry.getValue());
     }

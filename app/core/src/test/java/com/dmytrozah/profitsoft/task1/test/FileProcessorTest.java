@@ -4,6 +4,7 @@ import com.dmytrozah.profitsoft.task1.core.StatisticsService;
 import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.mapping.EntityFileProcessor;
+import com.dmytrozah.profitsoft.task1.mapping.exception.MalformedBookshelfException;
 import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
@@ -28,6 +28,24 @@ public class FileProcessorTest {
 
     static final Path TEST_DIR = Path.of("./data/test");
     static final Path TEST_JSON_PATH = TEST_DIR.resolve("/input/test.json");
+
+    static final Path MALFORMED_JSON_PATH = TEST_DIR.resolve("/input/malformed.json");
+
+    static final String MALFORMED_JSON = """
+            [
+                {
+                    "title": "Wuthering Heights",
+                    "author": "Emily Brontë",
+                    "year_published": 1847,
+                    "genre": "Gothic, Dark Romance"
+                },
+                {
+                    "title": "Wuthering Heights 2",
+                    "author": "Emily Brontë",
+                    "year_published": 1847,
+                    "genre": "Gothic, Dark Romance"
+                }
+            """;
 
     static final String TEST_JSON =
             """
@@ -88,6 +106,17 @@ public class FileProcessorTest {
         bookshelf.setPath(TEST_JSON_PATH.toString());
 
         assertEquals(2, fileProcessor.extractBooks(bookshelf, 50).size());
+    }
+
+    @Test
+    public void malformedBookshelf() throws IOException {
+        Mockito.when(fsProvider.getInputStream(eq(MALFORMED_JSON_PATH)))
+                .thenReturn(new ByteArrayInputStream(MALFORMED_JSON.getBytes()));
+
+        final Bookshelf bookshelf = new Bookshelf();
+        bookshelf.setPath(MALFORMED_JSON_PATH.toString());
+
+        assertThrows(MalformedBookshelfException.class, () -> fileProcessor.extractBooks(bookshelf, 50));
     }
 
     @Test

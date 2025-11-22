@@ -6,7 +6,7 @@ import com.dmytrozah.profitsoft.task1.core.entities.Bookshelf;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.Statistics;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsAttributeType;
 import com.dmytrozah.profitsoft.task1.core.entities.statistics.StatisticsExport;
-import com.dmytrozah.profitsoft.task1.mapping.exception.MalformedBookshelf;
+import com.dmytrozah.profitsoft.task1.mapping.exception.MalformedBookshelfException;
 import com.dmytrozah.profitsoft.task1.mapping.reader.DefaultFSProvider;
 import com.dmytrozah.profitsoft.task1.mapping.reader.EntityFSProvider;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -37,7 +37,7 @@ public class EntityFileProcessor {
 
     private final EntityFSProvider fsProvider;
 
-    private ExecutorService executor;
+    private ForkJoinPool executor;
 
     private StatisticsService statisticsService;
 
@@ -83,7 +83,8 @@ public class EntityFileProcessor {
             this.threads = threads;
         }
 
-        this.executor = Executors.newFixedThreadPool(threads);
+        //this.executor = Executors.newFixedThreadPool(threads);
+        this.executor = new ForkJoinPool(threads);
     }
 
     /**
@@ -177,8 +178,9 @@ public class EntityFileProcessor {
     }
 
     public List<Book> extractBooks(final Bookshelf bookshelf, final long limit){
-        if (Objects.isNull(bookshelf.getPath()))
-            throw new MalformedBookshelf(bookshelf);
+        if (Objects.isNull(bookshelf.getPath())) {
+            throw new IllegalArgumentException("Bookshelf path can't be null!");
+        }
 
         final List<Book> books = new ArrayList<>();
         final Path path = Paths.get(bookshelf.getPath());
@@ -207,8 +209,8 @@ public class EntityFileProcessor {
 
                 books.add(book);
             }
-        } catch (IOException e) {
-            return List.of();
+        } catch (Exception e) {
+            throw new MalformedBookshelfException(e, bookshelf);
         }
 
         return books;
@@ -254,6 +256,12 @@ public class EntityFileProcessor {
 
     public void shutdown() {
         this.executor.shutdown();
+
+        try {
+            this.executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public EntityFSProvider getFSProvider() {
